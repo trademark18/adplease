@@ -1,0 +1,22 @@
+{
+  "name": "adplease",
+  "version": "1.0.0",
+  "description": "Time entry bot for ADP",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trademark18/adplease.git"
+  },
+  "author": "Danny Reed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/trademark18/adplease/issues"
+  },
+  "homepage": "https://github.com/trademark18/adplease#readme",
+  "dependencies": {
+    "nightmare": "^3.0.2"
+  }
+}
