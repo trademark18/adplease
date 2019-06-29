@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/trademark18/adplease#readme",
   "dependencies": {
+    "csv-parse": "^4.4.3",
+    "dotenv": "^8.0.0",
+    "fs": "0.0.1-security",
+    "moment": "^2.24.0",
     "nightmare": "^3.0.2"
   }
 }
