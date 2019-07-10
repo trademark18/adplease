@@ -4,23 +4,59 @@
   "description": "Time entry bot for ADP",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "react-scripts start",
+    "build": "react-scripts build&&rm -rf mobile&&mv build mobile",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
   },
+  "homepage": "./",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/trademark18/adplease.git"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
   },
   "author": "Danny Reed",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/trademark18/adplease/issues"
   },
-  "homepage": "https://github.com/trademark18/adplease#readme",
   "dependencies": {
     "csv-parse": "^4.4.3",
     "dotenv": "^8.0.0",
     "fs": "0.0.1-security",
     "moment": "^2.24.0",
-    "nightmare": "^3.0.2"
+    "nightmare": "^3.0.2",
+    "emotion": "10.0.14",
+    "emotion-server": "10.0.14",
+    "emotion-theming": "10.0.14",
+    "onsenui": "2.10.8",
+    "react": "^16.8.6",
+    "react-dom": "16.8.6",
+    "react-emotion": "10.0.0",
+    "react-onsenui": "1.11.2",
+    "react-scripts": "3.0.1"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-compat": "^2.2.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jest": "^21.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-react": "^7.7.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

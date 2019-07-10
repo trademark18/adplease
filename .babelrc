@@ -1,0 +1,9 @@
+{
+  "presets": [
+    "react",
+    "stage-1"
+  ],
+  "plugins": [
+    "emotion",
+  ]
+}
