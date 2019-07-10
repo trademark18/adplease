@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "./static/css/main.eb1d0cea.chunk.css",
+    "main.js": "./static/js/main.8cfd7ede.chunk.js",
+    "main.js.map": "./static/js/main.8cfd7ede.chunk.js.map",
+    "runtime~main.js": "./static/js/runtime~main.d653cc00.js",
+    "runtime~main.js.map": "./static/js/runtime~main.d653cc00.js.map",
+    "static/css/2.75952338.chunk.css": "./static/css/2.75952338.chunk.css",
+    "static/js/2.c7d4d068.chunk.js": "./static/js/2.c7d4d068.chunk.js",
+    "static/js/2.c7d4d068.chunk.js.map": "./static/js/2.c7d4d068.chunk.js.map",
+    "index.html": "./index.html",
+    "precache-manifest.a7ac69e532bf14ea6ddcf18c384cfbb4.js": "./precache-manifest.a7ac69e532bf14ea6ddcf18c384cfbb4.js",
+    "service-worker.js": "./service-worker.js",
+    "static/css/2.75952338.chunk.css.map": "./static/css/2.75952338.chunk.css.map",
+    "static/css/main.eb1d0cea.chunk.css.map": "./static/css/main.eb1d0cea.chunk.css.map",
+    "static/media/onsenui.css": "./static/media/ionicons.dd4781d1.ttf"
+  }
+}
