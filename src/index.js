@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { platform } from 'onsenui';
+import 'rmc-picker/assets/index.css';
+import 'rmc-date-picker/assets/index.css';
+import 'rmc-picker/assets/popup.css';
 
 import './index.css';
 import App from './App';
