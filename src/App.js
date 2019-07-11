@@ -1,22 +1,22 @@
-import React from "react";
-import { Navigator } from "react-onsenui";
+import React from 'react';
+import { Navigator } from 'react-onsenui';
+import 'onsenui/css/onsenui.css';
+import 'onsenui/css/onsen-css-components.css';
 
-import "./App.css";
-import "onsenui/css/onsenui.css";
-import "onsenui/css/onsen-css-components.css";
+import './App.css';
+import './css/main.css';
+import './css/normalize.min.css';
 // import "onsenui/css/material-design-iconic-font/css/material-design-iconic-font.min.css";
 
-import GlobalProvider from "./js/contexts/GlobalProvider";
-import Main from "./js/pages/Main";
-import "./css/main.css";
-import "./css/normalize.min.css";
+import GlobalProvider from './js/contexts/GlobalProvider';
+import Main from './js/pages/Main';
 
 const App = () => (
   <GlobalProvider>
     <Navigator
       initialRoute={{
         component: Main,
-        props: { key: "main" }
+        props: { key: 'main' },
       }}
       renderPage={(route, navigator) => {
         const props = route.props || {};

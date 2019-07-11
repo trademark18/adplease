@@ -1,14 +1,13 @@
 import React from 'react';
 import '../../../css/SwipeableList.css';
 
-const SwipeableList = ({ children, background }) => {
-  const childrenWithProps = React.Children.map(children, child => {
-    if (!child.props.background) {
-      return React.cloneElement(child, { background });
-    }
-    return child;
-  });
-  return <div className="List">{childrenWithProps}</div>;
-};
+const SwipeableList = ({ children, background }) => (
+  <div className="List">{
+    React.Children
+      .map(children, child => !child.props.background
+        ? React.cloneElement(child, { background })
+        : child)}
+  </div>
+);
 
 export default SwipeableList;

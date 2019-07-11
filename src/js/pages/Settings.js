@@ -1,9 +1,9 @@
 import React from 'react';
-import { Page, List, ListItem } from 'react-onsenui';
+import { List, ListItem } from 'react-onsenui';
 
-import Header from '../components/Header';
+import MyPage from '../components/MyPage';
 
-const Settings = ({ back }) => {
+const Settings = () => {
   const listViewData = [
     {
       key: 'onDataClear',
@@ -26,9 +26,9 @@ const Settings = ({ back }) => {
   );
 
   return (
-    <Page renderToolbar={() => <Header title="Settings" back={back} />}>
+    <MyPage headerOptions={{ title: 'Settings' }}>
       <List dataSource={listViewData} renderRow={_renderRow} />
-    </Page>
+    </MyPage>
   );
 };
 

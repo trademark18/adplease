@@ -1,12 +1,10 @@
 import React from 'react';
-import { Page, Button, Icon } from 'react-onsenui';
+import { Button, Icon } from 'react-onsenui';
 
-import Header from '../components/Header';
+import MyPage from '../components/MyPage';
 import SwipeableList from '../components/SwipeableList/SwipeableList';
 import SwipeableListItem from '../components/SwipeableList/SwipeableListItem';
-import Settings from './Settings';
-
-const renderToolbar = () => <Header title="TimeCard" add />;
+import TimeEntry from './TimeEntry';
 
 const background = (
   <Icon
@@ -20,21 +18,18 @@ const dummyData = [
   'Planning: 8:30 AM - 8:45AM',
 ];
 
-const TimeCard = ({ navigator }) => {
-  console.log(navigator);
-  return (
-    <Page renderToolbar={renderToolbar}>
-      <SwipeableList >
-        {dummyData.map((value, idx) => (
-          <SwipeableListItem background={background} key={idx} onClick={() => navigator.pushPage({ component: Settings, props: { back: true } })}>
-            <Button modifier="quiet" style={{ color: 'black' }}>
-              <div className="ItemContent">{value}</div>
-            </Button>
-          </SwipeableListItem>
+const TimeCard = ({ navigator }) => (
+  <MyPage headerOptions={{ title: 'TimeCard', add: true, rightCallback: () => navigator.pushPage({ component: TimeEntry, props: { back: true } }) }}>
+    <SwipeableList >
+      {dummyData.map((value, idx) => (
+        <SwipeableListItem background={background} key={idx} onClick={() => navigator.pushPage({ component: TimeEntry, props: { back: true, data: { startDate: new Date() } } })}>
+          <Button modifier="quiet" style={{ color: 'black' }}>
+            <div className="ItemContent">{value}</div>
+          </Button>
+        </SwipeableListItem>
       ))}
-      </SwipeableList>
-    </Page>
-  );
-};
+    </SwipeableList>
+  </MyPage>
+);
 
 export default TimeCard;
