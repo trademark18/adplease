@@ -7,6 +7,8 @@ const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
 
+const timeBot = require('./timeBot');
+
 /* env vars and args */
 /** @typedef {Object} EnvironmentVariables */
 require('dotenv').config();
@@ -18,6 +20,8 @@ const DATE_COL_NAME_BASE = '#INTIMEdt_';
 const BTN_COL_NAME_BASE = '#BtnInsertRow_';
 const IN_COL_NAME_BASE = '#INTIMEtm_';
 const OUT_COL_NAME_BASE = '#OUTTIMEtm_';
+const SITE_URL = `https://ezlmportaldc1f.adp.com/ezLaborManagerNetRedirect/MAPortalStart.aspx?ISIClientID=${ISI_CLIENT_ID}`;
+const TIMESHEET_BTN = '#UI4_ctBody_UCTodaysActivities_btnTimeSheet';
 
 /* app */
 var app = module.exports = {
@@ -42,7 +46,8 @@ app.init = function init() {
 	Promise.all(promises)
 		.then(([nightmareResult, csvResult]) => {
 			//I have no idea where nightmareResult is coming from
-			console.log(app.nightmare);
+			//console.log(app.nightmare);
+			timeBot.enterTime(app.nightmare, csvResult);
 
 			// console.log(csvResult);
 		});
@@ -64,8 +69,8 @@ app.initNightmarePromise = function initNightmarePromise() {
 
 	const ret = app.nightmare
 		.authentication(process.env.ADP_USERNAME, process.env.ADP_PASSWORD)
-		.goto(`https://ezlmportaldc1f.adp.com/ezLaborManagerNetRedirect/MAPortalStart.aspx?ISIClientID=${ISI_CLIENT_ID}`)
-		.click('#UI4_ctBody_UCTodaysActivities_btnTimeSheet')
+		.goto(SITE_URL)
+		.click(TIMESHEET_BTN)
 		.wait('#INTIMEdt_0');
 
 	//todo - verify that adp is pointing at this week
@@ -97,7 +102,8 @@ app.readCsvPromise = function readCsvPromise(csvPath) {
 				return newRow;
 			});
 
-			newCsvResult.sort((a, b) => a.valueOf() - b.valueOf());
+			//newCsvResult.sort((a, b) => a.valueOf() - b.valueOf());
+			newCsvResult.reverse();
 
 			return newCsvResult;
 		});

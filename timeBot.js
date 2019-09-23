@@ -1,5 +1,3 @@
-const Nightmare = require('nightmare')
-const nightmare = Nightmare();
 const moment = require('moment');
 
 const DATE_COL_NAME_BASE = '#INTIMEdt_';
@@ -19,11 +17,17 @@ exports.enterTime = function(nightmareResult, entries){
 function typeInRow(record){
     // Check the date of the current row against the current record and see if we need to add a row
     var dateColName = DATE_COL_NAME_BASE + origRowIndex;
-    var rowDate
 
     rowDatePromise(dateColName)
     .then(function(data){
-        console.log(moment(data));
+        var currentDate = record.start.format("MM/DD/YYYY");
+        if(data === currentDate){
+            console.log("Found correct line for entry");
+        }
+        else{
+            console.log("Need to make a new line for this entry");
+        }
+
     })
     .then(console.log)
     .catch(console.log);
