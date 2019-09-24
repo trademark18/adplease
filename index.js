@@ -41,7 +41,10 @@ app.init = function init() {
 
 	Promise.all(promises)
 		.then(([nightmareResult, csvResult]) => {
-			console.log(csvResult);
+			//I have no idea where nightmareResult is coming from
+			console.log(app.nightmare);
+
+			// console.log(csvResult);
 		});
 };
 
@@ -62,7 +65,10 @@ app.initNightmarePromise = function initNightmarePromise() {
 	const ret = app.nightmare
 		.authentication(process.env.ADP_USERNAME, process.env.ADP_PASSWORD)
 		.goto(`https://ezlmportaldc1f.adp.com/ezLaborManagerNetRedirect/MAPortalStart.aspx?ISIClientID=${ISI_CLIENT_ID}`)
-		.click('#UI4_ctBody_UCTodaysActivities_btnTimeSheet');
+		.click('#UI4_ctBody_UCTodaysActivities_btnTimeSheet')
+		.wait('#INTIMEdt_0');
+
+	//todo - verify that adp is pointing at this week
 
 	return ret;
 }
