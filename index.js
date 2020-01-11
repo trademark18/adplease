@@ -23,6 +23,34 @@ const OUT_COL_NAME_BASE = '#OUTTIMEtm_';
 const SITE_URL = `https://ezlmportaldc1f.adp.com/ezLaborManagerNetRedirect/MAPortalStart.aspx?ISIClientID=${ISI_CLIENT_ID}`;
 const TIMESHEET_BTN = '#UI4_ctBody_UCTodaysActivities_btnTimeSheet';
 
+const ADPCOLUMN = {
+	CLIENT: 'Client',
+	PRACTICE: 'Practice',
+	PROJECT: 'Project',
+	TASK: 'Task'
+}
+
+/**
+ * TODO: Make this a config file or better yet a web source (Lambda?)
+ */
+const COLUMNDEF = {
+	OUI: {
+		"Client": "OUI",
+		"Practice": "Digital Experience",
+		"Project": "Odysseys GMS Phase II"
+	},
+	A2: {
+		"Client": "ASC Internal",
+		"Practice": "Data & Analytics",
+		"Project": "A2 Analytics"
+	},
+	ASC: {
+		"Client": "ASC Internal",
+		"Practice": "Digital Experience",
+		"Project": "DX" 
+	}
+}
+
 /* app */
 var app = module.exports = {
 	nightmareConfig: { show: true },
@@ -48,6 +76,17 @@ app.init = async function init() {
 	]);
 	
 	await timeBot.enterTime(app.nightmare, csvResult);
+
+	// Once we've entered the time, we want the user to click the submit button in the browser
+    // So basically we want to keep the Nightmare going and not end the program.
+    while(app.nightmare.proc.exitCode === null)
+    {
+        // Check again in a second to see if user closed the Electron window
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    };
+
+	// We done.
+    process.exit();
 
 };
 
@@ -90,7 +129,10 @@ app.readCsvPromise = function readCsvPromise(csvPath) {
 		.then(csvResult => {
 			const newCsvResult = csvResult.map(row => {
 				const newRow = {
-					name: row.Name,
+					client: app.getColumnValue(row.Name, ADPCOLUMN.CLIENT),
+					practice: app.getColumnValue(row.Name, ADPCOLUMN.PRACTICE),
+					project: app.getColumnValue(row.Name, ADPCOLUMN.PROJECT),
+					task: row.Name.split('_')[1],
 					start: moment(row.Start, 'M/DD/YYYY h:mm:ss A'),
 					end: moment(row.End, 'M/DD/YYYY h:mm:ss A')
 				};
@@ -98,14 +140,18 @@ app.readCsvPromise = function readCsvPromise(csvPath) {
 				return newRow;
 			});
 
-			//newCsvResult.sort((a, b) => a.valueOf() - b.valueOf());
-			newCsvResult.reverse();
-
 			return newCsvResult;
 		});
 
 	return ret;
 };
+
+
+app.getColumnValue = function getColumnValue(rawRow, colDefinition){
+	// Get prefix
+	let definitionIdentifier = rawRow.split('_')[0];
+	return COLUMNDEF[definitionIdentifier][colDefinition];
+} 
 
 // init :)
 app.init();
