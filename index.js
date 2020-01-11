@@ -7,6 +7,8 @@ const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
 
+const timeBot = require('./timeBot');
+
 /* env vars and args */
 /** @typedef {Object} EnvironmentVariables */
 require('dotenv').config();
@@ -18,34 +20,74 @@ const DATE_COL_NAME_BASE = '#INTIMEdt_';
 const BTN_COL_NAME_BASE = '#BtnInsertRow_';
 const IN_COL_NAME_BASE = '#INTIMEtm_';
 const OUT_COL_NAME_BASE = '#OUTTIMEtm_';
+const SITE_URL = `https://ezlmportaldc1f.adp.com/ezLaborManagerNetRedirect/MAPortalStart.aspx?ISIClientID=${ISI_CLIENT_ID}`;
+const TIMESHEET_BTN = '#UI4_ctBody_UCTodaysActivities_btnTimeSheet';
+
+const ADPCOLUMN = {
+	CLIENT: 'Client',
+	PRACTICE: 'Practice',
+	PROJECT: 'Project',
+	TASK: 'Task'
+}
+
+/**
+ * TODO: Make this a config file or better yet a web source (Lambda?)
+ */
+const COLUMNDEF = {
+	OUI: {
+		"Client": "OUI",
+		"Practice": "Digital Experience",
+		"Project": "Odysseys GMS Phase II"
+	},
+	A2: {
+		"Client": "ASC Internal",
+		"Practice": "Data & Analytics",
+		"Project": "A2 Analytics"
+	},
+	ASC: {
+		"Client": "ASC Internal",
+		"Practice": "Digital Experience",
+		"Project": "DX" 
+	}
+}
 
 /* app */
 var app = module.exports = {
 	nightmareConfig: { show: true },
 	rowIndex: 0,
+	nightmare: undefined,
 	addedRowIndex: 14 // 13 + 1
 };
 
 /** init */
-app.init = function init() {
+app.init = async function init() {
 	//parse args
 	app.arguments = app.getArguments();
 
 	const csvPath = app.arguments._[0];
 
 	//start up processes
-	const promises = [
+	[
+		_,
+		csvResult
+	] = await Promise.all([
 		app.initNightmarePromise(),
 		app.readCsvPromise(csvPath)
-	];
+	]);
+	
+	await timeBot.enterTime(app.nightmare, csvResult);
 
-	Promise.all(promises)
-		.then(([nightmareResult, csvResult]) => {
-			//I have no idea where nightmareResult is coming from
-			console.log(app.nightmare);
+	// Once we've entered the time, we want the user to click the submit button in the browser
+    // So basically we want to keep the Nightmare going and not end the program.
+    while(app.nightmare.proc.exitCode === null)
+    {
+        // Check again in a second to see if user closed the Electron window
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    };
 
-			// console.log(csvResult);
-		});
+	// We done.
+    process.exit();
+
 };
 
 /** get arguments */
@@ -59,18 +101,16 @@ app.getArguments = function getArguments() {
 };
 
 /** start nightmare */
-app.initNightmarePromise = function initNightmarePromise() {
+app.initNightmarePromise = async function initNightmarePromise() {
 	app.nightmare = Nightmare(app.nightmareConfig);
 
-	const ret = app.nightmare
+	await app.nightmare
 		.authentication(process.env.ADP_USERNAME, process.env.ADP_PASSWORD)
-		.goto(`https://ezlmportaldc1f.adp.com/ezLaborManagerNetRedirect/MAPortalStart.aspx?ISIClientID=${ISI_CLIENT_ID}`)
-		.click('#UI4_ctBody_UCTodaysActivities_btnTimeSheet')
+		.goto(SITE_URL)
+		.click(TIMESHEET_BTN)
 		.wait('#INTIMEdt_0');
 
-	//todo - verify that adp is pointing at this week
-
-	return ret;
+	return;
 }
 
 /** read csv file */
@@ -89,7 +129,10 @@ app.readCsvPromise = function readCsvPromise(csvPath) {
 		.then(csvResult => {
 			const newCsvResult = csvResult.map(row => {
 				const newRow = {
-					name: row.Name,
+					client: app.getColumnValue(row.Name, ADPCOLUMN.CLIENT),
+					practice: app.getColumnValue(row.Name, ADPCOLUMN.PRACTICE),
+					project: app.getColumnValue(row.Name, ADPCOLUMN.PROJECT),
+					task: row.Name.split('_')[1],
 					start: moment(row.Start, 'M/DD/YYYY h:mm:ss A'),
 					end: moment(row.End, 'M/DD/YYYY h:mm:ss A')
 				};
@@ -97,13 +140,18 @@ app.readCsvPromise = function readCsvPromise(csvPath) {
 				return newRow;
 			});
 
-			newCsvResult.sort((a, b) => a.valueOf() - b.valueOf());
-
 			return newCsvResult;
 		});
 
 	return ret;
 };
+
+
+app.getColumnValue = function getColumnValue(rawRow, colDefinition){
+	// Get prefix
+	let definitionIdentifier = rawRow.split('_')[0];
+	return COLUMNDEF[definitionIdentifier][colDefinition];
+} 
 
 // init :)
 app.init();
