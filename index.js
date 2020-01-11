@@ -27,30 +27,28 @@ const TIMESHEET_BTN = '#UI4_ctBody_UCTodaysActivities_btnTimeSheet';
 var app = module.exports = {
 	nightmareConfig: { show: true },
 	rowIndex: 0,
+	nightmare: undefined,
 	addedRowIndex: 14 // 13 + 1
 };
 
 /** init */
-app.init = function init() {
+app.init = async function init() {
 	//parse args
 	app.arguments = app.getArguments();
 
 	const csvPath = app.arguments._[0];
 
 	//start up processes
-	const promises = [
+	[
+		_,
+		csvResult
+	] = await Promise.all([
 		app.initNightmarePromise(),
 		app.readCsvPromise(csvPath)
-	];
+	]);
+	
+	await timeBot.enterTime(app.nightmare, csvResult);
 
-	Promise.all(promises)
-		.then(([nightmareResult, csvResult]) => {
-			//I have no idea where nightmareResult is coming from
-			//console.log(app.nightmare);
-			timeBot.enterTime(app.nightmare, csvResult);
-
-			// console.log(csvResult);
-		});
 };
 
 /** get arguments */
@@ -64,18 +62,16 @@ app.getArguments = function getArguments() {
 };
 
 /** start nightmare */
-app.initNightmarePromise = function initNightmarePromise() {
+app.initNightmarePromise = async function initNightmarePromise() {
 	app.nightmare = Nightmare(app.nightmareConfig);
 
-	const ret = app.nightmare
+	await app.nightmare
 		.authentication(process.env.ADP_USERNAME, process.env.ADP_PASSWORD)
 		.goto(SITE_URL)
 		.click(TIMESHEET_BTN)
 		.wait('#INTIMEdt_0');
 
-	//todo - verify that adp is pointing at this week
-
-	return ret;
+	return;
 }
 
 /** read csv file */
