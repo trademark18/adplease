@@ -17,28 +17,35 @@ var origIndex = 0;
 var addedIndex = 14;
 var activeIndex = 0;
 
-// Nightmare object
-var nm;
+var app = {};
+var service = module.exports = {};
 
-exports.enterTime = async function (nightmareResult, entries) {
-    nm = nightmareResult;
+service.init = function init(caller){
+    Object.assign(app, caller);
+    console.log("Time Bot service initialized.");
+}
+
+// Nightmare object
+service.enterTime = async function enterTime(entries) {
 
     // Sequentially type in each row
     for(let i=0; i<entries.length; i++){
         // Prepare row for time entry
-        await processRecord(entries[i]);
+        await prepareRowForEntry(entries[i]);
 
         // Enter time on row
         await enterTimeOnRow(entries[i]);
     }
 }
 
+// Private functions
+
 /**
  * @async
  * Prepare rows in the DOM for insertion of record
  * @param {Object} record The record for the time entry row
  */
-async function processRecord(record) {
+async function prepareRowForEntry(record) {
     
         // Check the date of the current row against the current record and see if we need to add a row
         let dateColName = `${DATE_COL_NAME_BASE}${origIndex}`;
@@ -70,7 +77,7 @@ async function processRecord(record) {
  * Add a new row to the grid
  */
 async function addRow(){
-    await nm.click(`${BTN_COL_NAME_BASE}${activeIndex}`);
+    await app.nightmare.click(`${BTN_COL_NAME_BASE}${activeIndex}`);
     console.log(`Added new row at index ${addedIndex}`);
 }
 
@@ -90,7 +97,7 @@ async function enterTimeOnRow(record){
     let taskInput = `${TASK_COL_NAME_BASE.replace('{0}', activeIndex)}`;
 
 
-    await nm
+    await app.nightmare
         .click(startTimeInput)
         .wait(100)
         .type(startTimeInput, record.start.format("LT")) // "9:45 AM"

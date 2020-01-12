@@ -7,19 +7,17 @@ const moment = require('moment');
 const fetch = require('node-fetch');
 const path = require('path');
 
-const timeBot = require('./timeBot');
-
 /* env vars and args */
 /** @typedef {Object} EnvironmentVariables */
 require('dotenv').config();
 
 /* constants */
 const ISI_CLIENT_ID = 'Archetype1';
-
 const SITE_URL = `https://ezlmportaldc1f.adp.com/ezLaborManagerNetRedirect/MAPortalStart.aspx?ISIClientID=${ISI_CLIENT_ID}`;
 const COL_DEF_URL = 'https://gist.githubusercontent.com/trademark18/be725a7b4a0dff8a9b6643c0f480f857/raw/columnDefinitions.json';
 const TIMESHEET_BTN = '#UI4_ctBody_UCTodaysActivities_btnTimeSheet';
 
+// Enum for column names
 const ADPCOLUMN = {
 	CLIENT: 'Client',
 	PRACTICE: 'Practice',
@@ -33,6 +31,8 @@ var app = module.exports = {
 	rowIndex: 0,
 	colDef: undefined,
 	nightmare: undefined,
+	timeBotService: require('./timeBot'),
+	gui: require('./UI/adpleaseui'),
 	addedRowIndex: 14 // 13 + 1
 };
 
@@ -41,9 +41,11 @@ app.init = async function init() {
 	//parse args
 	app.arguments = app.getArguments();
 
-	const csvPath = app.arguments._[0];
+	// Init other files
+	app.gui = app.gui.init(app);
+	app.timeBotService = app.timeBotService.init(app);
 
-	//start up processes
+	// Self init
 	[
 		_,
 		app.colDef
@@ -51,12 +53,15 @@ app.init = async function init() {
 		app.initNightmarePromise(),
 		app.initColDefPromise(),
 	]);
+};
 
-	// Promise can't be part of Promise.all because it must run after initColDefPromise finishes()
-	let csvResult = await app.readCsvPromise(csvPath)
 
-	await timeBot.enterTime(app.nightmare, csvResult);
+app.doTimeEntry = async function doTimeEntry(){
+	let csvResult = await app.readCsvPromise(app.arguments._[0])
+	await timeBotService.enterTime(csvResult);
+}
 
+app.deathRow = async function deathRow(){
 	// Once we've entered the time, we want the user to click the submit button in the browser
     // So basically we want to keep the Nightmare going and not end the program.
     while(app.nightmare.proc.exitCode === null)
@@ -67,8 +72,7 @@ app.init = async function init() {
 
 	// We done.
     process.exit();
-
-};
+}
 
 /** get arguments */
 app.getArguments = function getArguments() {
