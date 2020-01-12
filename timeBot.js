@@ -1,5 +1,6 @@
-const moment = require('moment');
-
+/**
+ * Set up constants which represent DOM-related string values
+ */
 const DATE_COL_NAME_BASE = '#INTIMEdt_';
 const BTN_COL_NAME_BASE = '#BtnInsertRow_';
 const IN_COL_NAME_BASE = '#INTIMEtm_';
@@ -9,10 +10,14 @@ const PRACTICE_COL_NAME_BASE = '#TR_{0} td:nth-child(13) a';
 const PROJECT_COL_NAME_BASE = '#TR_{0} td:nth-child(14) a';
 const TASK_COL_NAME_BASE = '#TR_{0} td:nth-child(15) a';
 
+/**
+ * Set up indices used to track the row in ADP
+ */
 var origIndex = 0;
 var addedIndex = 14;
 var activeIndex = 0;
 
+// Nightmare object
 var nm;
 
 exports.enterTime = async function (nightmareResult, entries) {
@@ -20,43 +25,61 @@ exports.enterTime = async function (nightmareResult, entries) {
 
     // Sequentially type in each row
     for(let i=0; i<entries.length; i++){
-        await typeInRow(entries[i]);
+        // Prepare row for time entry
+        await processRecord(entries[i]);
+
+        // Enter time on row
+        await enterTimeOnRow(entries[i]);
     }
 }
 
-async function typeInRow(record) {
+/**
+ * @async
+ * Prepare rows in the DOM for insertion of record
+ * @param {Object} record The record for the time entry row
+ */
+async function processRecord(record) {
     
         // Check the date of the current row against the current record and see if we need to add a row
-        let dateColName = DATE_COL_NAME_BASE + origIndex;
+        let dateColName = `${DATE_COL_NAME_BASE}${origIndex}`;
 
-        let date = await nm.evaluate(dateColName => {
-            return document.querySelector(dateColName).innerText
-        }, dateColName)
+        // Get the date of the current row on the DOM
+        let date = await nm
+            .evaluate(dateColName => {
+                return document.querySelector(dateColName).innerText
+            }, dateColName);
             
-        
+        // If the date is today, then manage the index and proceed.
         if (date === record.start.format("MM/DD/YYYY")) {
             console.log(`Matched row date ${date} with record date ${record.start.format("MM/DD/YYYY")} with index ${origIndex}`);
             activeIndex = origIndex++;
         }
         else {
-            // Click button to add row
+            // New row is needed before insertion.
             await addRow();
 
-            console.log(`Added new row at index ${addedIndex}`);
             activeIndex = addedIndex++;
         }
-
-        await enterTimeOnRow(record);
 
         return; 
     };
 
 
-
+/**
+ * @async
+ * Add a new row to the grid
+ */
 async function addRow(){
     await nm.click(`${BTN_COL_NAME_BASE}${activeIndex}`);
+    console.log(`Added new row at index ${addedIndex}`);
 }
 
+
+/**
+ * @async
+ * Type values into the row
+ * @param {Object} record The object containing values to be entered on the row
+ */
 async function enterTimeOnRow(record){
 
     let startTimeInput = `${IN_COL_NAME_BASE}${activeIndex}`;
