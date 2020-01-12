@@ -4,7 +4,7 @@
 const csv = require('csvtojson');
 const Nightmare = require('nightmare');
 const moment = require('moment');
-const fs = require('fs');
+const fetch = require('node-fetch');
 const path = require('path');
 
 const timeBot = require('./timeBot');
@@ -16,11 +16,8 @@ require('dotenv').config();
 /* constants */
 const ISI_CLIENT_ID = 'Archetype1';
 
-const DATE_COL_NAME_BASE = '#INTIMEdt_';
-const BTN_COL_NAME_BASE = '#BtnInsertRow_';
-const IN_COL_NAME_BASE = '#INTIMEtm_';
-const OUT_COL_NAME_BASE = '#OUTTIMEtm_';
 const SITE_URL = `https://ezlmportaldc1f.adp.com/ezLaborManagerNetRedirect/MAPortalStart.aspx?ISIClientID=${ISI_CLIENT_ID}`;
+const COL_DEF_URL = 'https://gist.githubusercontent.com/trademark18/be725a7b4a0dff8a9b6643c0f480f857/raw/columnDefinitions.json';
 const TIMESHEET_BTN = '#UI4_ctBody_UCTodaysActivities_btnTimeSheet';
 
 const ADPCOLUMN = {
@@ -30,31 +27,11 @@ const ADPCOLUMN = {
 	TASK: 'Task'
 }
 
-/**
- * TODO: Make this a config file or better yet a web source (Lambda?)
- */
-const COLUMNDEF = {
-	OUI: {
-		"Client": "OUI",
-		"Practice": "Digital Experience",
-		"Project": "Odysseys GMS Phase II"
-	},
-	A2: {
-		"Client": "ASC Internal",
-		"Practice": "Data & Analytics",
-		"Project": "A2 Analytics"
-	},
-	ASC: {
-		"Client": "ASC Internal",
-		"Practice": "Digital Experience",
-		"Project": "DX" 
-	}
-}
-
 /* app */
 var app = module.exports = {
 	nightmareConfig: { show: true },
 	rowIndex: 0,
+	colDef: undefined,
 	nightmare: undefined,
 	addedRowIndex: 14 // 13 + 1
 };
@@ -69,12 +46,15 @@ app.init = async function init() {
 	//start up processes
 	[
 		_,
-		csvResult
+		app.colDef
 	] = await Promise.all([
 		app.initNightmarePromise(),
-		app.readCsvPromise(csvPath)
+		app.initColDefPromise(),
 	]);
-	
+
+	// Promise can't be part of Promise.all because it must run after initColDefPromise finishes()
+	let csvResult = await app.readCsvPromise(csvPath)
+
 	await timeBot.enterTime(app.nightmare, csvResult);
 
 	// Once we've entered the time, we want the user to click the submit button in the browser
@@ -113,6 +93,22 @@ app.initNightmarePromise = async function initNightmarePromise() {
 	return;
 }
 
+
+/**
+ * Retrieve the GitHub Gist file containing the column definitions
+ * That respository is used as a maintainable source for adding new available prefixes
+ * to represent new sets of values for the column values it provides.
+ * @returns {Object} The column definition from the repository 
+ */
+app.initColDefPromise = async function initColDefPromise(){
+	let jsonResult;
+	
+	await fetch(COL_DEF_URL)
+		.then(res => jsonResult = res.json());
+	
+	return jsonResult;
+}
+
 /** read csv file */
 app.readCsvPromise = function readCsvPromise(csvPath) {
 	app.csv = csv();
@@ -146,11 +142,18 @@ app.readCsvPromise = function readCsvPromise(csvPath) {
 	return ret;
 };
 
-
-app.getColumnValue = function getColumnValue(rawRow, colDefinition){
+/**
+ * getColumnValue
+ * Get the value for the predefined columns like project/practice/client, etc.
+ * @param {string} rawTaskName The task name in the raw format Ex. "OUI_5749 - OUI"
+ * @param {string} columnName The name of the column for which to retrieve the value (enum)
+ * @returns {string} The value to be used in columnName
+ */
+app.getColumnValue = function getColumnValue(rawTaskName, columnName){
 	// Get prefix
-	let definitionIdentifier = rawRow.split('_')[0];
-	return COLUMNDEF[definitionIdentifier][colDefinition];
+	// rawTaskName is in the format "definitionIdentifier_taskName" Ex. "OUI_5749 - OUI" 
+	let definitionIdentifier = rawTaskName.split('_')[0];
+	return app.colDef[definitionIdentifier][columnName];
 } 
 
 // init :)
