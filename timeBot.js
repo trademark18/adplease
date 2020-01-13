@@ -23,6 +23,9 @@ var nm;
 exports.enterTime = async function (nightmareResult, entries) {
     nm = nightmareResult;
 
+    // Check to see what the addedIndex should be
+    addedIndex = await nm.evaluate(() => document.querySelectorAll('*[id^="BtnInsertRow_"]').length);
+
     // Sequentially type in each row
     for(let i=0; i<entries.length; i++){
         // Prepare row for time entry
