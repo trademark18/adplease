@@ -4,7 +4,10 @@
   "description": "Time entry bot for ADP",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js FullWeekExport.csv",
+    "start:dev": "nodemon --inspect --watch dev.js --watch src dev.js --exec babel-node FullWeekExport.csv",
+    "compile": "babel src --out-dir dist",
+    "start:compiled": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -15,13 +18,33 @@
   "bugs": {
     "url": "https://github.com/trademark18/adplease/issues"
   },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ],
+    "plugins": [
+      "@babel/plugin-transform-runtime"
+    ]
+  },
   "homepage": "https://github.com/trademark18/adplease#readme",
   "dependencies": {
     "csvtojson": "^2.0.10",
     "dotenv": "^8.0.0",
+    "@babel/runtime": "^7.7.2",
     "moment": "^2.24.0",
     "nightmare": "^3.0.2",
     "node-fetch": "^2.6.0",
     "yargs": "^13.2.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.0",
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/node": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/preset-env": "^7.0.0"
   }
 }

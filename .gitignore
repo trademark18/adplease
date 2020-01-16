@@ -62,3 +62,5 @@ typings/
 
 # Batch script used for launching VS Code faster
 OpenVSCode.bat
+
+dist/
