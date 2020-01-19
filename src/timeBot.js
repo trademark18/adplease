@@ -20,21 +20,14 @@ let activeIndex = 0;
 // Nightmare object
 let nm;
 
-const enterTime = async (nightmareResult, entries) => {
-  nm = nightmareResult;
-
-  // Check to see what the addedIndex should be
-  addedIndex = await nm.evaluate(() => document.querySelectorAll('*[id^="BtnInsertRow_"]').length);
-
-  // Sequentially type in each row
-  for (let i = 0; i < entries.length; i++) {
-    // Prepare row for time entry
-    await processRecord(entries[i]);
-
-    // Enter time on row
-    await enterTimeOnRow(entries[i]);
-  }
-};
+/**
+ * @async
+ * Add a new row to the grid
+ */
+async function addRow() {
+  await nm.click(`${BTN_COL_NAME_BASE}${activeIndex}`);
+  console.log(`Added new row at index ${addedIndex}`);
+}
 
 /**
  * @async
@@ -46,8 +39,8 @@ async function processRecord(record) {
   const dateColName = `${DATE_COL_NAME_BASE}${origIndex}`;
 
   // Get the date of the current row on the DOM
-  const date = await nm
-    .evaluate((dateColName) => document.querySelector(dateColName).innerText, dateColName);
+  // eslint-disable-next-line no-shadow
+  const date = await nm.evaluate(dateColName => document.querySelector(dateColName).innerText, dateColName);
 
   // If the date is today, then manage the index and proceed.
   if (date === record.start.format('MM/DD/YYYY')) {
@@ -60,17 +53,6 @@ async function processRecord(record) {
     activeIndex = addedIndex++;
   }
 }
-
-
-/**
- * @async
- * Add a new row to the grid
- */
-async function addRow() {
-  await nm.click(`${BTN_COL_NAME_BASE}${activeIndex}`);
-  console.log(`Added new row at index ${addedIndex}`);
-}
-
 
 /**
  * @async
@@ -121,6 +103,22 @@ async function enterTimeOnRow(record) {
   // .wait('#FLZoomLayer')
   // .press(taskInput, 'Down') // Down arrow
 }
+
+const enterTime = async (nightmareResult, entries) => {
+  nm = nightmareResult;
+
+  // Check to see what the addedIndex should be
+  addedIndex = await nm.evaluate(() => document.querySelectorAll('*[id^="BtnInsertRow_"]').length);
+
+  // Sequentially type in each row
+  for (let i = 0; i < entries.length; i++) {
+    // Prepare row for time entry
+    await processRecord(entries[i]);
+
+    // Enter time on row
+    await enterTimeOnRow(entries[i]);
+  }
+};
 
 export {
   enterTime,
