@@ -8,7 +8,7 @@ import csv from 'csvtojson';
 import Nightmare from 'nightmare';
 import path from 'path';
 
-import { enterTime } from './src/timeBot';
+import { enterTime } from './timeBot';
 
 /* env vars and args */
 /** @typedef {Object} EnvironmentVariables */

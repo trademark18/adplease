@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js FullWeekExport.csv",
-    "start:dev": "nodemon --inspect --watch dev.js --watch src dev.js --exec babel-node FullWeekExport.csv",
+    "start:dev": "nodemon --inspect --watch src src/index.js --exec babel-node FullWeekExport.csv",
     "compile": "babel src --out-dir dist",
-    "start:compiled": "node index.js"
+    "start:compiled": "node index.js FullWeekExport.csv"
   },
   "repository": {
     "type": "git",
