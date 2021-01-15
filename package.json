@@ -28,23 +28,23 @@
   },
   "homepage": "https://github.com/trademark18/adplease#readme",
   "dependencies": {
+    "@babel/runtime": "^7.12.5",
     "csvtojson": "^2.0.10",
-    "dotenv": "^8.0.0",
-    "@babel/runtime": "^7.7.2",
-    "moment": "^2.24.0",
+    "dotenv": "^8.2.0",
+    "moment": "^2.29.1",
     "nightmare": "^3.0.2",
-    "node-fetch": "^2.6.0",
-    "yargs": "^13.2.4"
+    "node-fetch": "^2.6.1",
+    "yargs": "^13.3.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/node": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/node": "^7.12.10",
+    "@babel/plugin-transform-runtime": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
     "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.20.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
     "nodemon": "^1.18.9"
   }
 }
