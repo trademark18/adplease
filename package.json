@@ -33,7 +33,7 @@
     "dotenv": "^8.2.0",
     "moment": "^2.29.1",
     "nightmare": "^3.0.2",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "yargs": "^13.3.2"
   },
   "devDependencies": {
